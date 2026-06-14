@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MerchOps · June 2026</title>
+<style>
+:root{
+  --bg:#0d1117;
+  --surface:#161b22;
+  --card:#21262d;
+  --card2:#2d333b;
+  --gold:#f5a623;
+  --blue:#3b82f6;
+  --green:#22c55e;
+  --purple:#a78bfa;
+  --red:#f87171;
+  --border:rgba(240,246,252,.08);
+  --border2:rgba(240,246,252,.13);
+  --text:#e6edf3;
+  --text2:#8b949e;
+  --text3:#656d76;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+
+/* TOP BAR */
+.top-bar{background:var(--surface);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border2)}
+.top-bar-logo{display:flex;align-items:center;gap:10px}
+.top-bar-title{color:var(--text);font-size:15px;font-weight:700;letter-spacing:-.4px}
+.top-bar-title span{color:var(--gold)}
+.top-bar-badge{background:rgba(245,166,35,.12);color:var(--gold);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid rgba(245,166,35,.25);letter-spacing:.3px}
+.top-bar-right{display:flex;align-items:center;gap:10px}
+.live-clock{color:var(--text2);font-size:11.5px;font-variant-numeric:tabular-nums}
+.today-pill{background:var(--gold);color:#000;border:none;border-radius:6px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .15s;letter-spacing:.2px}
+.today-pill:hover{opacity:.85}
+
+/* TAB BAR */
+.tab-bar{background:var(--surface);border-bottom:1px solid var(--border2);padding:0 24px;display:flex;gap:0}
+.tab-btn{background:none;border:none;color:var(--text2);font-size:12px;font-weight:600;padding:11px 18px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.2px}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--gold)}
+.tab-btn:hover{color:var(--text)}
+
+/* CONTROLS */
+.controls{background:var(--surface);padding:8px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.ctrl-label{color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.ctrl-select{background:var(--card);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;outline:none}
+.ctrl-select:focus{border-color:var(--gold)}
+.ctrl-select option{background:var(--card)}
+.nav-btns{display:flex;gap:4px;margin-left:auto}
+.nav-btn{background:var(--card);border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .15s}
+.nav-btn:hover{background:var(--card2);color:var(--text);border-color:var(--border2)}
+#back-today-btn{display:none;background:rgba(245,166,35,.15);color:var(--gold);border-color:rgba(245,166,35,.3);font-weight:700}
+.filter-input{background:var(--card);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:6px;font-size:11px;width:160px;outline:none}
+.filter-input::placeholder{color:var(--text3)}
+.filter-input:focus{border-color:var(--gold)}
+.filter-group{display:flex;align-items:center;gap:6px}
+
+/* WHO'S ON PANEL */
+.whos-on-panel{padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--border2)}
+.wo-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.wo-title{color:var(--text);font-size:12px;font-weight:700;letter-spacing:.1px}
+.wo-date-badge{background:var(--card);color:var(--text2);font-size:10px;padding:2px 9px;border-radius:20px;font-weight:600;border:1px solid var(--border2)}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);color:#22c55e;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;border:1px solid rgba(34,197,94,.25);letter-spacing:.3px}
+.live-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+.wo-grid{display:flex;flex-wrap:wrap;gap:8px}
+
+/* WHO'S ON CARDS */
+.wo-card{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;min-width:200px;flex:0 0 auto;max-height:340px;overflow-y:auto}
+.wo-card-header{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.wo-card-count{font-size:9px;font-weight:600;opacity:.6;text-transform:none;letter-spacing:0}
+.wo-persons{display:flex;flex-direction:column;gap:2px}
+.wo-person{display:flex;align-items:center;gap:7px;padding:3px 0;border-radius:4px}
+.wo-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;flex-shrink:0;position:relative;letter-spacing:0}
+.wo-avatar-ring{position:absolute;inset:-2px;border-radius:50%;border:2px solid transparent}
+.wo-info{flex:1;min-width:0}
+.wo-name{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.wo-shift-label{font-size:9px;color:var(--text3);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wo-empty{font-size:11px;color:var(--text3);font-style:italic;padding:4px 0}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;padding:16px 24px}
+.sched-table{border-collapse:collapse;min-width:1200px;width:100%}
+
+/* TABLE HEADERS */
+.sched-table th{background:var(--surface);color:var(--text3);font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:7px 3px;text-align:center;border-bottom:1px solid var(--border2);border-right:1px solid var(--border);white-space:nowrap;position:sticky;top:0;z-index:10}
+.sched-table th.week-header{background:var(--bg);color:var(--gold);font-size:9px;font-weight:800;letter-spacing:.5px;border-bottom:2px solid rgba(245,166,35,.3)}
+.sched-table th.today-col{background:rgba(245,166,35,.08)!important;border-left:2px solid rgba(245,166,35,.5)!important;border-right:2px solid rgba(245,166,35,.5)!important;color:var(--gold)}
+.sched-table th.name-col{text-align:left;padding-left:12px;min-width:150px;position:sticky;left:0;z-index:20;background:var(--surface)}
+.sched-table th.tz-col{min-width:60px}
+
+/* TABLE ROWS & CELLS */
+.sched-table td{padding:3px 2px;text-align:center;border-bottom:1px solid var(--border);border-right:1px solid var(--border);font-size:10px;vertical-align:middle;background:var(--bg)}
+.sched-table td.name-col{text-align:left;padding-left:12px;background:var(--surface);position:sticky;left:0;z-index:5;border-right:1px solid var(--border2);min-width:150px}
+.sched-table td.tz-col{font-size:9px;color:var(--text3);background:var(--surface);padding:3px 6px;white-space:nowrap}
+.sched-table tr:hover td{background:#1a2030}
+.sched-table tr:hover td.name-col,.sched-table tr:hover td.tz-col{background:#1e2430}
+.sched-table td.today-col{border-left:2px solid rgba(245,166,35,.4)!important;border-right:2px solid rgba(245,166,35,.4)!important;background:rgba(245,166,35,.03)}
+
+/* SECTION ROWS */
+.section-row td{background:var(--bg);color:var(--text3);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:8px 12px;text-align:left;border:none;border-bottom:1px solid var(--border);border-top:2px solid var(--border2)}
+.section-row td.today-col{background:rgba(245,166,35,.05)!important}
+
+/* SHIFT PILLS */
+.shift-pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:9.5px;font-weight:700;white-space:nowrap;letter-spacing:.1px;line-height:1.5}
+.s-off{color:var(--text3);font-size:9px}
+.s-blank{}
+.sp-early{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.sp-morning{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+.sp-mid{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.2)}
+.sp-late{background:rgba(245,166,35,.15);color:#fbbf24;border:1px solid rgba(245,166,35,.2)}
+.sp-overnight{background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.2)}
+.sp-holiday{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.25);font-size:9px}
+.sp-oncall{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.2);font-size:9px}
+.s-today-off{color:var(--text3);font-size:9px;opacity:.4}
+
+/* EVENT ROW */
+.event-row td{padding:3px 2px;background:var(--surface);border-bottom:1px solid var(--border2);border-right:1px solid var(--border)}
+.event-row td.name-col{background:var(--surface);color:var(--text3);font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.event-chip{display:inline-flex;align-items:center;gap:2px;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;white-space:nowrap;margin:1px 0;line-height:1.3}
+.ev-nba{background:rgba(249,115,22,.15);color:#fb923c;border:1px solid rgba(249,115,22,.2)}
+.ev-nhl{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.2)}
+.ev-horse{background:rgba(236,72,153,.15);color:#f472b6;border:1px solid rgba(236,72,153,.2)}
+.ev-golf{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.ev-tennis{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.2)}
+.ev-motor{background:rgba(234,179,8,.15);color:#facc15;border:1px solid rgba(234,179,8,.2)}
+.ev-holiday{background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.25);font-weight:800}
+.ev-soccer{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.15)}
+.ev-boxing{background:rgba(248,113,113,.15);color:#fca5a5;border:1px solid rgba(248,113,113,.2)}
+
+/* COVERAGE ROW */
+.coverage-row td{background:var(--surface);color:var(--text3);font-size:9px;font-style:italic;padding:4px;border-top:1px solid var(--border2)}
+.coverage-row td.today-col{background:rgba(245,166,35,.05)!important}
+
+/* WEEK BORDERS */
+.week-start{border-left:1px solid rgba(59,130,246,.2)!important}
+
+/* EMP NAME CELL */
+.emp-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.emp-title{font-size:9px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ky-name{color:var(--gold)!important;font-weight:700!important}
+.predict-row td.name-col{background:rgba(34,197,94,.04)}
+.predict-row .emp-name{color:#4ade80}
+
+/* NOTE DOT */
+.note-dot{display:inline-block;width:4px;height:4px;background:var(--blue);border-radius:50%;margin-left:3px;vertical-align:middle}
+.cell-inner{position:relative;cursor:pointer}
+.cell-inner:hover::after{content:'';position:absolute;inset:-1px;background:rgba(245,166,35,.05);border-radius:3px;pointer-events:none}
+
+/* NOTE MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-box{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:24px;width:360px;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.modal-title{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--text)}
+.modal-textarea{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:10px;font-size:12px;resize:vertical;min-height:80px;font-family:inherit;color:var(--text);outline:none}
+.modal-textarea:focus{border-color:var(--gold)}
+.modal-actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+.modal-btn{padding:7px 16px;border-radius:7px;border:1px solid var(--border2);font-size:11px;font-weight:700;cursor:pointer;transition:opacity .15s;letter-spacing:.2px}
+.modal-btn:hover{opacity:.85}
+.modal-btn.save{background:var(--gold);color:#000;border-color:var(--gold)}
+.modal-btn.del{background:rgba(248,113,113,.15);color:#f87171;border-color:rgba(248,113,113,.3)}
+.modal-btn.cancel{background:var(--card2);color:var(--text2);border-color:var(--border2)}
+
+/* HP TAB */
+#tab-homepage-pane{background:var(--bg);min-height:calc(100vh - 100px);padding:24px}
+.hp-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px}
+.hp-subtitle{font-size:12px;color:var(--text2);margin-bottom:20px}
+.hp-grid{display:flex;flex-direction:column;gap:12px;max-width:1400px}
+.hp-day-card{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--border2)}
+.hp-day-header{padding:10px 16px;font-size:12px;font-weight:800;letter-spacing:.2px;display:flex;align-items:center;gap:10px;color:#fff}
+.hp-table{display:grid;border-top:1px solid var(--border)}
+.hp-th{padding:6px 10px;background:var(--surface);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-right:1px solid var(--border);border-bottom:1px solid var(--border2)}
+.hp-th:last-child{border-right:none}
+.hp-td-sports{padding:8px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--card)}
+.hp-td-sports:last-child{border-right:none}
+.hp-td-coverage{padding:8px 10px;border-right:1px solid var(--border);background:var(--surface)}
+.hp-td-coverage:last-child{border-right:none}
+.hp-sports{display:flex;flex-direction:column;gap:3px}
+.hp-sport-pill{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;border:1px solid transparent}
+.hp-sport-nba{background:rgba(249,115,22,.15);color:#fb923c;border-color:rgba(249,115,22,.2)}
+.hp-sport-mlb{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.15)}
+.hp-sport-nhl{background:rgba(59,130,246,.12);color:#60a5fa;border-color:rgba(59,130,246,.15)}
+.hp-sport-wnba{background:rgba(167,139,250,.12);color:#c4b5fd;border-color:rgba(167,139,250,.15)}
+.hp-sport-custom{background:rgba(245,166,35,.1);color:#fbbf24;border-color:rgba(245,166,35,.2)}
+.hp-sport-comp{background:rgba(255,255,255,.05);color:var(--text3);border-color:var(--border)}
+.hp-chips{display:flex;flex-wrap:wrap;gap:3px}
+.hp-chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;white-space:nowrap;cursor:default;border:1px solid transparent}
+.hp-chip-early{background:rgba(99,102,241,.6);border-color:rgba(99,102,241,.4)}
+.hp-chip-morning{background:rgba(34,197,94,.6);border-color:rgba(34,197,94,.4)}
+.hp-chip-mid{background:rgba(59,130,246,.6);border-color:rgba(59,130,246,.4)}
+.hp-chip-eve{background:rgba(245,166,35,.6);border-color:rgba(245,166,35,.4)}
+.hp-chip-late{background:rgba(239,68,68,.6);border-color:rgba(239,68,68,.4)}
+.hp-no-coverage{font-size:10px;color:var(--text3);font-style:italic}
+.hp-callouts{max-width:1400px;margin-top:16px;background:var(--card);border-radius:10px;border:1px solid var(--border2);padding:16px 20px}
+.hp-callouts-title{font-size:12px;font-weight:800;color:var(--text);margin-bottom:12px}
+.hp-callout-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:900px){.hp-callout-list{grid-template-columns:1fr}}
+.hp-callout{font-size:11.5px;color:var(--text2);display:flex;align-items:flex-start;gap:8px;line-height:1.5;padding:8px 10px;background:var(--surface);border-radius:7px;border:1px solid var(--border)}
+.hp-callout-icon{font-size:15px;flex-shrink:0;line-height:1}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .whos-on-panel{display:none}
+  .controls{padding:8px 12px}
+  .table-wrap{padding:8px 12px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-logo">
+    <div class="top-bar-title">MerchOps <span>Schedule</span></div>
+    <div class="top-bar-badge">June 2026</div>
+  </div>
+  <div class="top-bar-right">
+    <div id="live-clock" class="live-clock" title="All times shown in ET — Who's On status is based on this clock"></div>
+    <button class="today-pill" onclick="jumpToToday()">↩ Today</button>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-schedule-btn" onclick="switchTab('schedule')">Schedule</button>
+  <button class="tab-btn" id="tab-homepage-btn" onclick="switchTab('homepage')">HP Coverage</button>
+</div>
+
+<!-- ===== SCHEDULE TAB ===== -->
+<div id="tab-schedule-pane">
+
+<!-- CONTROLS -->
+<div class="controls">
+  <span class="ctrl-label">View</span>
+  <div class="filter-group">
+    <input class="filter-input" id="search-input" type="text" placeholder="Search name..." oninput="applyFilter()">
+    <select class="ctrl-select" id="group-filter" onchange="applyFilter()">
+      <option value="all">All Groups</option>
+      <option value="g1">SBK</option>
+      <option value="g2">FlyWheelOps</option>
+      <option value="g3">Racing Ops</option>
+    </select>
+  </div>
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="navDay(-7)">◀◀ Week</button>
+    <button class="nav-btn" onclick="navDay(-1)">◀ Day</button>
+    <button class="nav-btn" id="back-today-btn" onclick="jumpToToday()">↩ Today</button>
+    <button class="nav-btn" onclick="navDay(1)">Day ▶</button>
+    <button class="nav-btn" onclick="navDay(7)">Week ▶▶</button>
+  </div>
+</div>
+
+<!-- WHO'S ON PANEL -->
+<div class="whos-on-panel">
+  <div class="wo-header">
+    <div class="wo-title">Who's On</div>
+    <div class="wo-date-badge" id="wo-date-badge">Today</div>
+    <div class="live-badge" id="live-badge"><div class="live-dot"></div>LIVE</div>
+  </div>
+  <div class="wo-grid" id="wo-grid"></div>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrap">
+  <table class="sched-table" id="sched-table">
+    <thead id="table-head"></thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+</div>
+<!-- ===== END SCHEDULE TAB ===== -->
+
+<!-- ===== HP COVERAGE TAB ===== -->
+<div id="tab-homepage-pane" style="display:none">
+  <div class="hp-title">Homepage Coverage</div>
+  <div class="hp-subtitle">June 2026 &nbsp;·&nbsp; HP Coverage Planning</div>
+  <div class="hp-grid" id="hp-grid"></div>
+</div>
+<!-- ===== END HP TAB ===== -->
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay" id="note-modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Note</div>
+    <textarea class="modal-textarea" id="modal-ta" placeholder="Add a note for this cell..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn del" id="modal-del" onclick="deleteNote()">Delete</button>
+      <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn save" onclick="saveNote()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const DATES = [
+  {d:'5/31',dy:'Sun'},{d:'6/1',dy:'Mon'},{d:'6/2',dy:'Tue'},{d:'6/3',dy:'Wed'},
+  {d:'6/4',dy:'Thu'},{d:'6/5',dy:'Fri'},{d:'6/6',dy:'Sat'},{d:'6/7',dy:'Sun'},
+  {d:'6/8',dy:'Mon'},{d:'6/9',dy:'Tue'},{d:'6/10',dy:'Wed'},{d:'6/11',dy:'Thu'},
+  {d:'6/12',dy:'Fri'},{d:'6/13',dy:'Sat'},{d:'6/14',dy:'Sun'},{d:'6/15',dy:'Mon'},
+  {d:'6/16',dy:'Tue'},{d:'6/17',dy:'Wed'},{d:'6/18',dy:'Thu'},{d:'6/19',dy:'Fri'},
+  {d:'6/20',dy:'Sat'},{d:'6/21',dy:'Sun'},{d:'6/22',dy:'Mon'},{d:'6/23',dy:'Tue'},
+  {d:'6/24',dy:'Wed'},{d:'6/25',dy:'Thu'},{d:'6/26',dy:'Fri'},{d:'6/27',dy:'Sat'},
+  {d:'6/28',dy:'Sun'},{d:'6/29',dy:'Mon'},{d:'6/30',dy:'Tue'},{d:'7/1',dy:'Wed'},
+  {d:'7/2',dy:'Thu'},{d:'7/3',dy:'Fri'},{d:'7/4',dy:'Sat'},{d:'7/5',dy:'Sun'}
+];
+
+const WEEKS = [
+  {label:'May 31',        span:1, start:0,  current:false},
+  {label:'Jun 1–7',       span:7, start:1,  current:false},
+  {label:'Jun 8–14',      span:7, start:8,  current:false},
+  {label:'Jun 15–21',     span:7, start:15, current:false},
+  {label:'Jun 22–28',     span:7, start:22, current:false},
+  {label:'Jun 29–Jul 5',  span:7, start:29, current:false},
+];
+
+const G1 = [
+  {n:'Darren Doyle',   tz:'Ireland 🇮🇪', s:['OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF']},
+  {n:'Mahima Munjal',  tz:'Ireland 🇮🇪', s:['OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM']},
+  {n:'Shane McCabe',   tz:'Ireland 🇮🇪', s:['OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','OFF','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF']},
+  {n:'Niall Connolly', tz:'Ireland 🇮🇪', s:['5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','OFF','OFF','OFF','OFF','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF','5 AM - 1 PM','5 AM - 1 PM','OFF','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','5 AM - 1 PM','OFF','OFF']},
+  {n:'Aashini Desai',  tz:'EST ⭐',       s:['OFF','10 AM - 6 PM','10 AM - 6 PM','10 AM - 6 PM','10 AM - 6 PM','10 AM - 6 PM','OFF','OFF','10 AM - 6 PM','10 AM - 6 PM','10 AM - 6 PM','10 AM - 6 PM','OFF','ON CALL','ON CALL','10 AM - 6 PM','10 AM - 6 PM','10 AM - 6 PM','10 AM - 6 PM','HOLIDAY','OFF','OFF','10 AM - 6 PM','10 AM - 6 PM','10 AM - 6 PM','OFF','OFF','OFF','OFF','OFF','10 AM - 6 PM','10 AM - 6 PM','10 AM - 6 PM','HOLIDAY','OFF','OFF']},
+  {n:'William Eklund', tz:'PDX ⭐',       s:['OFF','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','ON CALL','ON CALL','OFF','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','OFF','OFF','OFF','OFF','OFF','OFF','HOLIDAY','OFF','OFF','OFF','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','OFF','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','HOLIDAY','ON CALL','OFF']},
+  {n:'Ryan Hardgrove', tz:'EST',          s:['OFF','1 PM - 9 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','3 PM - 11 PM','OFF','OFF','1 PM - 9 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','HOLIDAY','OFF','OFF']},
+  {n:'Cydney Tindal',  tz:'LAX',          s:['2 PM - 10 PM','OFF','2 PM - 10 PM','2 PM - 10 PM','3 PM - 11 PM','3 PM - 11 PM','OFF','OFF','2 PM - 10 PM','2 PM - 10 PM','2 PM - 10 PM','3 PM - 11 PM','OFF','1 PM - 10 PM','1 PM - 10 PM','OFF','2 PM - 10 PM','2 PM - 10 PM','3 PM - 11 PM','3 PM - 11 PM','OFF','OFF','2 PM - 10 PM','2 PM - 10 PM','2 PM - 10 PM','3 PM - 11 PM','3 PM - 11 PM','OFF','OFF','2 PM - 10 PM','3 PM - 11 PM','3 PM - 11 PM','3 PM - 11 PM','HOLIDAY','2 PM - 10 PM','2 PM - 10 PM']},
+  {n:'Justin Petrille', tz:'LAX 🖥️',     s:['12 PM - 8 PM','OFF','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','OFF','OFF','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','OFF','OFF','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','HOLIDAY','OFF','OFF','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','OFF','1 PM - 9 PM','1 PM - 9 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','HOLIDAY','OFF','OFF']},
+  {n:'Zara Broomby',   tz:'AUS 🌙',       s:['7 PM - 3 AM','7 PM - 3 AM','7 PM - 3 AM','7 PM - 3 AM','OFF','OFF','7 PM - 3 AM','OFF','7 PM - 3 AM','7 PM - 3 AM','7 PM - 3 AM','OFF','OFF','7 PM - 3 AM','7 PM - 3 AM','7 PM - 3 AM','7 PM - 3 AM','7 PM - 3 AM','OFF','HOLIDAY','7 PM - 3 AM','7 PM - 3 AM','7 PM - 3 AM','7 PM - 3 AM','7 PM - 3 AM','OFF','OFF','7 PM - 3 AM','7 PM - 3 AM','7 PM - 3 AM','OFF','OFF','OFF','HOLIDAY','7 PM - 3 AM','7 PM - 3 AM']},
+];
+
+const G2 = [
+  {n:'Chad Rowley',       tz:'EST',  s:['OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF']},
+  {n:'Glen Belekis',      tz:'EST',  s:['OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF']},
+  {n:'Will Schleichert',  tz:'PDT',  s:['OFF','1 PM - 9 PM','12 PM - 8 PM','1 PM - 9 PM','1 PM - 9 PM','1 PM - 9 PM','OFF','OFF','1 PM - 9 PM','12 PM - 8 PM','1 PM - 9 PM','1 PM - 9 PM','1 PM - 9 PM','OFF','OFF','1 PM - 9 PM','12 PM - 8 PM','1 PM - 9 PM','1 PM - 9 PM','1 PM - 9 PM','OFF','OFF','1 PM - 9 PM','12 PM - 8 PM','1 PM - 9 PM','1 PM - 9 PM','1 PM - 9 PM','OFF','OFF','1 PM - 9 PM','12 PM - 8 PM','1 PM - 9 PM','1 PM - 9 PM','1 PM - 9 PM','OFF','OFF']},
+  {n:'Dylan Mendelowitz', tz:'CDT',  s:['OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','12 PM - 8 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','OFF','OFF','OFF']},
+  {n:'Brian Bentley',     tz:'PDT',  s:['OFF','12 PM - 8 PM','2 PM - 10 PM','12 PM - 8 PM','12 PM - 8 PM','OFF','12 PM - 8 PM','12 PM - 8 PM','12 PM - 8 PM','2 PM - 10 PM','12 PM - 8 PM','12 PM - 8 PM','OFF','OFF','12 PM - 8 PM','12 PM - 8 PM','2 PM - 10 PM','12 PM - 8 PM','OFF','OFF','OFF','12 PM - 8 PM','12 PM - 8 PM','2 PM - 10 PM','12 PM - 8 PM','12 PM - 8 PM','OFF','OFF','12 PM - 8 PM','12 PM - 8 PM','2 PM - 10 PM','OFF','OFF','OFF','OFF','OFF']},
+  {n:'David Cotts',       tz:'EST',  s:['9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','2 PM - 10 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','2 PM - 10 PM','OFF','OFF','9 AM - 5 PM','OFF','9 AM - 5 PM','9 AM - 5 PM','2 PM - 10 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','2 PM - 10 PM','OFF','OFF','9 AM - 5 PM','9 AM - 5 PM','OFF','9 AM - 5 PM','2 PM - 10 PM','OFF','OFF','9 AM - 5 PM']},
+  {n:'Eric Milam',        tz:'EST',  s:['OFF','2 PM - 10 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','9 AM - 5 PM','10 AM - 6 PM','2 PM - 10 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','10 AM - 6 PM','2 PM - 10 PM','9 AM - 5 PM','OFF','9 AM - 5 PM','OFF','OFF','OFF','2 PM - 10 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','2 PM - 10 PM','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','OFF']},
+  {n:'Ky Coony',          tz:'PDT',  s:['OFF','12 PM - 8 PM','2 PM - 10 PM','12 PM - 8 PM','12 PM - 8 PM','12 PM - 8 PM','OFF','OFF','12 PM - 8 PM','OFF','12 PM - 8 PM','12 PM - 8 PM','12 PM - 8 PM','12 PM - 8 PM','OFF','12 PM - 8 PM','2 PM - 10 PM','12 PM - 8 PM','12 PM - 8 PM','OFF','OFF','OFF','12 PM - 8 PM','2 PM - 10 PM','12 PM - 8 PM','12 PM - 8 PM','12 PM - 8 PM','OFF','OFF','OFF','2 PM - 10 PM','12 PM - 8 PM','12 PM - 8 PM','12 PM - 8 PM','OFF','12 PM - 8 PM']},
+  {n:'Matt Campion',      tz:'EST',  s:['OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','9 AM - 5 PM','10 AM - 6 PM','OFF','9 AM - 5 PM','2 PM - 10 PM','2 PM - 10 PM','OFF','9 AM - 5 PM','9 AM - 5 PM','OFF','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','10 AM - 6 PM','OFF','9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','OFF','9 AM - 5 PM','10 AM - 6 PM','OFF','9 AM - 5 PM','OFF','9 AM - 5 PM','OFF','9 AM - 5 PM','10 AM - 6 PM','OFF']},
+  {n:'Matt Cerletti',     tz:'PDT',  s:['2 PM - 10 PM','12 PM - 8 PM','OFF','OFF','12 PM - 8 PM','2 PM - 10 PM','2 PM - 10 PM','2 PM - 10 PM','12 PM - 8 PM','OFF','OFF','12 PM - 8 PM','2 PM - 10 PM','2 PM - 10 PM','2 PM - 10 PM','OFF','OFF','OFF','12 PM - 8 PM','2 PM - 10 PM','2 PM - 10 PM','2 PM - 10 PM','12 PM - 8 PM','OFF','OFF','12 PM - 8 PM','2 PM - 10 PM','2 PM - 10 PM','2 PM - 10 PM','OFF','OFF','OFF','12 PM - 8 PM','2 PM - 10 PM','2 PM - 10 PM','2 PM - 10 PM']},
+  {n:'Zack Leggett',      tz:'EST',  s:['9 AM - 5 PM','9 AM - 5 PM','9 AM - 5 PM','2 PM - 10 PM','OFF','9 AM - 5 PM','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','2 PM - 10 PM','OFF','OFF','9 AM - 5 PM','OFF','9 AM - 5 PM','9 AM - 5 PM','2 PM - 10 PM','OFF','9 AM - 5 PM','9 AM - 5 PM','OFF','OFF','9 AM - 5 PM','2 PM - 10 PM','OFF','9 AM - 5 PM','9 AM - 5 PM','OFF']},
+];
+
+const G3 = [
+  {n:'Bryan Dorr',    tz:'PDX ⭐', s:['OFF','11 AM - 3 PM','11 AM - 3 PM','11 AM - 7 PM','11 AM - 7 PM','11 AM - 7 PM','9 AM - 5 PM','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF']},
+  {n:'Bill Caldwell', tz:'PDX',    s:['OFF','OFF','OFF','8 AM - 6 PM','8 AM - 6 PM','8 AM - 6 PM','8 AM - 6 PM','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF']},
+  {n:'Shawn Brooker', tz:'PDX',    s:['8 AM - 6 PM','8 AM - 6 PM','8 AM - 6 PM','8 AM - 6 PM','8 AM - 1 PM','8 AM - 1 PM','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF','OFF']},
+];
+
+const TITLES = {
+  'Darren Doyle':    'Content Specialist',
+  'Mahima Munjal':   'Content Specialist',
+  'Shane McCabe':    'Content Ops Executive',
+  'Niall Connolly':  'Content Ops Manager',
+  'Aashini Desai':   'MerchOps Team Lead',
+  'William Eklund':  'MerchOps Team Lead',
+  'Ryan Hardgrove':  'MerchOps Coordinator',
+  'Cydney Tindal':   'MerchOps Associate',
+  'Justin Petrille': 'MerchOps Coordinator',
+  'Zara Broomby':    'Sports Trader',
+  'Chad Rowley':     'MerchOps Senior Manager',
+  'Glen Belekis':    'Merch Enablement Sr. Mgr',
+  'Will Schleichert':'MerchOps Manager',
+  'Dylan Mendelowitz':'MerchOps Team Lead',
+  'Brian Bentley':   'MerchOps Coordinator',
+  'David Cotts':     'MerchOps Team Lead',
+  'Eric Milam':      'MerchOps Team Lead',
+  'Ky Coony':        'MerchOps Associate',
+  'Matt Campion':    'MerchOps Team Lead',
+  'Matt Cerletti':   'MerchOps Associate',
+  'Zack Leggett':    'MerchOps Associate',
+  'Bryan Dorr':      'Content Ops Shift Lead',
+  'Bill Caldwell':   'Content Ops Associate',
+  'Shawn Brooker':   'Content Ops Associate',
+};
+
+const PREDICTS = ['Dylan Mendelowitz'];
+const EARLY_SPECIALS_DATES = {}; // cleared for June schedule
+const STAR = '<span class="spec-star">★</span>';
+
+const COVERAGE = Array(36).fill('');
+
+// Events at each date index (0-based)
+// All dates verified from live sources — June 2026
+// NBA Finals: NY Knicks vs SA Spurs (Knicks lead 3-1 as of 6/12)
+// World Cup 2026: USA in Group D (Paraguay, Australia, Turkey)
+const EVENTS = {
+  3:  [{cls:'ev-nba',   lbl:'🏀 NBA Finals G1'}],                                    // Wed 6/3 — Knicks @ Spurs (SA)
+  4:  [{cls:'ev-golf',  lbl:'⛳ US Women\'s Open R1'}],                               // Thu 6/4 — Riviera CC
+  5:  [{cls:'ev-nba',   lbl:'🏀 NBA Finals G2'},{cls:'ev-golf',lbl:'⛳ US Women\'s Open R2'}], // Fri 6/5
+  6:  [{cls:'ev-horse', lbl:'🏇 Belmont Stakes'},{cls:'ev-golf',lbl:'⛳ US Women\'s Open R3'}], // Sat 6/6
+  7:  [{cls:'ev-golf',  lbl:'⛳ US Women\'s Open R4'}],                               // Sun 6/7 — Nelly Korda wins
+  8:  [{cls:'ev-nba',   lbl:'🏀 NBA Finals G3'}],                                    // Mon 6/8 — Spurs @ Knicks (MSG)
+  10: [{cls:'ev-nba',   lbl:'🏀 NBA Finals G4'}],                                    // Wed 6/10 — Spurs @ Knicks (29-pt Knicks comeback)
+  11: [{cls:'ev-soccer',lbl:'⚽ World Cup Kickoff'}],                                 // Thu 6/11 — Mexico vs South Africa
+  12: [{cls:'ev-nba',   lbl:'🏀 NBA Finals G5'},{cls:'ev-soccer',lbl:'⚽ WC: USA vs Paraguay'}], // Fri 6/12 — TODAY (G5 is tomorrow)
+  13: [{cls:'ev-nba',   lbl:'🏀 NBA Finals G5'}],                                    // Sat 6/13 — Knicks @ Spurs (8:30 ET, ABC)
+  16: [{cls:'ev-nba',   lbl:'🏀 NBA Finals G6*'}],                                   // Tue 6/16 — Spurs @ Knicks (if needed)
+  18: [{cls:'ev-golf',  lbl:'⛳ US Open R1'}],                                        // Thu 6/18 — Shinnecock Hills
+  19: [{cls:'ev-holiday',lbl:'🇺🇸 Juneteenth'},{cls:'ev-nba',lbl:'🏀 NBA Finals G7*'},{cls:'ev-golf',lbl:'⛳ US Open R2'},{cls:'ev-soccer',lbl:'⚽ WC: USA vs Australia'}], // Fri 6/19 — massive day
+  20: [{cls:'ev-golf',  lbl:'⛳ US Open R3'}],                                        // Sat 6/20
+  21: [{cls:'ev-golf',  lbl:'⛳ US Open R4'}],                                        // Sun 6/21
+  25: [{cls:'ev-soccer',lbl:'⚽ WC: USA vs Turkey'},{cls:'ev-golf',lbl:'⛳ KPMG Women\'s PGA R1'}], // Thu 6/25 — Hazeltine
+  26: [{cls:'ev-golf',  lbl:'⛳ KPMG Women\'s PGA R2'}],                              // Fri 6/26
+  27: [{cls:'ev-golf',  lbl:'⛳ KPMG Women\'s PGA R3'}],                              // Sat 6/27
+  28: [{cls:'ev-soccer',lbl:'⚽ WC Round of 32'},{cls:'ev-golf',lbl:'⛳ KPMG Women\'s PGA R4'}], // Sun 6/28
+  29: [{cls:'ev-soccer',lbl:'⚽ WC Round of 32'}],
+  30: [{cls:'ev-soccer',lbl:'⚽ WC Round of 32'}],
+  31: [{cls:'ev-soccer',lbl:'⚽ WC Round of 32'}],
+  32: [{cls:'ev-soccer',lbl:'⚽ WC Round of 32'}],
+  33: [{cls:'ev-soccer',lbl:'⚽ WC Round of 32'}],
+  34: [{cls:'ev-holiday',lbl:'🇺🇸 Independence Day'},{cls:'ev-soccer',lbl:'⚽ WC Round of 16'}], // Sat 7/4
+  35: [{cls:'ev-soccer',lbl:'⚽ WC Round of 16'}],                                   // Sun 7/5
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let todayIdx = 0;
+let viewIdx = 0;
+let isAutoTracking = true;
+let filterName = '';
+let filterGroup = 'all';
+let clockInterval = null;
+let currentModalKey = null;
+
+// ============================================================
+// INIT
+// ============================================================
+function findTodayIndex() {
+  const now = new Date();
+  const m = now.getMonth()+1;
+  const d = now.getDate();
+  const key = `${m}/${d}`;
+  const idx = DATES.findIndex(x => x.d === key);
+  return idx >= 0 ? idx : 1; // fallback to 6/1 (idx 1)
+}
+
+function init() {
+  todayIdx = findTodayIndex();
+  viewIdx = todayIdx;
+  renderTable();
+  renderWhosOn();
+  updateClock();
+  // Scroll to today after the DOM has painted
+  requestAnimationFrame(() => scrollToToday());
+  clockInterval = setInterval(() => {
+    updateClock();
+    if(isAutoTracking) {
+      const newToday = findTodayIndex();
+      if(newToday !== todayIdx) { todayIdx = newToday; viewIdx = newToday; renderTable(); scrollToToday(); }
+      renderWhosOn();
+    }
+  }, 30000);
+  buildHPTab();
+}
+
+function scrollToToday() {
+  const wrap = document.querySelector('.table-wrap');
+  const todayTh = document.querySelector('.sched-table th.today-col');
+  if(!wrap || !todayTh) return;
+  // Center today's column in the scroll viewport, accounting for sticky name+tz columns (~220px)
+  const stickyOffset = 220;
+  const cellLeft = todayTh.offsetLeft;
+  const cellWidth = todayTh.offsetWidth;
+  const wrapWidth = wrap.clientWidth;
+  const target = cellLeft - stickyOffset - (wrapWidth - stickyOffset) / 2 + cellWidth / 2;
+  wrap.scrollLeft = Math.max(0, target);
+}
+
+// ============================================================
+// CLOCK
+// ============================================================
+function updateClock() {
+  // Build ET time directly from UTC-4 so it always matches the Who's On logic exactly.
+  const now = new Date();
+  // Build ET date by offsetting UTC by -4h
+  const etMs = now.getTime() - (4 * 3600 * 1000);
+  const et = new Date(etMs);
+  const days  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months= ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dow = days[et.getUTCDay()];
+  const mon = months[et.getUTCMonth()];
+  const day = et.getUTCDate();
+  let   h   = et.getUTCHours();
+  const min = String(et.getUTCMinutes()).padStart(2,'0');
+  const ampm= h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('live-clock').textContent = `${dow}, ${mon} ${day}  ${h}:${min} ${ampm} ET`;
+}
+
+// ============================================================
+// SHIFT CLASSIFICATION
+// ============================================================
+function shiftClass(shift) {
+  if(!shift || shift==='') return 's-blank';
+  const s = shift.trim();
+  if(s==='OFF') return 's-off';
+  if(s==='HOLIDAY') return 'sp-holiday';
+  if(s==='ON CALL') return 'sp-oncall';
+  if(s==='COLLIN') return 'sp-mid';
+  if(s.startsWith('5 AM')||s.startsWith('6 AM')) return 'sp-early';
+  if(s.startsWith('8 AM')||s.startsWith('9 AM')||s.startsWith('10 AM')) return 'sp-morning';
+  if(s.startsWith('11 AM')||s.startsWith('12 PM')) return 'sp-mid';
+  if(s.startsWith('1 PM')||s.startsWith('2 PM')||s.startsWith('3 PM')) return 'sp-late';
+  if(s.startsWith('7 PM')||s.startsWith('6 PM')) return 'sp-overnight';
+  return 'sp-mid';
+}
+
+function shiftGroupLabel(shift) {
+  if(!shift || shift.trim() === '' || shift.trim() === 'OFF' || shift.trim() === 'HOLIDAY') return null;
+  const s = shift.trim();
+  if(s.startsWith('5 AM')) return 'Early';
+  if(s.startsWith('8 AM') || s.startsWith('9 AM')) return 'Morning';
+  if(s.startsWith('10 AM') || s.startsWith('11 AM')) return 'Mid-Day';
+  if(s.startsWith('12 PM') || s.startsWith('1 PM')) return 'Mid';
+  if(s.startsWith('2 PM') || s.startsWith('3 PM')) return 'Afternoon';
+  if(s.startsWith('7 PM')) return 'Overnight';
+  return 'On';
+}
+
+// ============================================================
+// SPECIALS LOGIC
+// ============================================================
+function getSpecialsInfo(emp, i) {
+  const shift = (emp.s[i]||'').trim();
+  if(!shift || shift === 'OFF' || shift === 'HOLIDAY' || shift === 'COLLIN') return null;
+
+  let label = null;
+  const isG2 = G2.some(e => e.n === emp.n);
+  if(isG2 && shift === '2 PM - 10 PM') label = 'Late ★';
+  if(EARLY_SPECIALS_DATES[emp.n] && EARLY_SPECIALS_DATES[emp.n].has(i) && shift === '9 AM - 5 PM') label = 'Early ★';
+  return label;
+}
+
+// ============================================================
+// SHIFT TIME PARSER FOR WHO'S ON
+// Treats all shift times as-is (ET reference) — no timezone conversion.
+// The schedule grid IS the reference: "12 PM - 8 PM" means 12–8 PM ET.
+// ============================================================
+function parseShiftWindow(shift) {
+  if(!shift || shift==='OFF' || shift==='HOLIDAY' || shift==='' || shift==='COLLIN') return null;
+  if(shift==='ON CALL') return 'oncall';
+
+  const s = shift.trim().toUpperCase();
+  const match = s.match(/^(\d+(?::\d+)?)\s*(AM|PM)\s*[-–]\s*(\d+(?::\d+)?)\s*(AM|PM)$/);
+  if(!match) return null;
+
+  function toH(num, mer) {
+    const parts = num.split(':');
+    let h = parseInt(parts[0]);
+    const m = parts[1] ? parseInt(parts[1])/60 : 0;
+    if(mer==='PM' && h!==12) h += 12;
+    if(mer==='AM' && h===12) h = 0;
+    return h + m;
+  }
+
+  let start = toH(match[1], match[2]);
+  let end   = toH(match[3], match[4]);
+  if(end <= start) end += 24; // overnight shift (e.g. 7 PM - 3 AM)
+  return [start, end];
+}
+
+function getCurrentETHour() {
+  // Rock-solid UTC-based calculation. EDT = UTC-4 (valid all of June-October).
+  // Avoids Intl/toLocaleString entirely — no parsing, no NaN risk.
+  const now = new Date();
+  let etH = now.getUTCHours() - 4;
+  if(etH < 0) etH += 24;
+  return etH + now.getUTCMinutes() / 60;
+}
+
+// ============================================================
+// WHO'S ON
+// ============================================================
+function renderWhosOn() {
+  const idx = viewIdx;
+  const dateInfo = DATES[idx];
+  document.getElementById('wo-date-badge').textContent = `${dateInfo.dy} ${dateInfo.d}`;
+
+  const liveBadge = document.getElementById('live-badge');
+  liveBadge.style.display = (isAutoTracking && idx === todayIdx) ? 'inline-flex' : 'none';
+
+  const etNow = getCurrentETHour();
+  const isLiveDay = (isAutoTracking && idx === todayIdx);
+
+  const allEmps = [
+    ...G1.map(e=>({...e,grp:'SBK'})),
+    ...G2.map(e=>({...e,grp:'FlyWheelOps'})),
+    ...G3.map(e=>({...e,grp:'Racing Ops'}))
+  ];
+
+  const active = [], upcoming = [], offline = [];
+
+  allEmps.forEach(emp => {
+    const shift = (emp.s[idx]||'').trim();
+
+    if(!shift || shift==='OFF' || shift==='HOLIDAY' || shift==='' || shift==='COLLIN') {
+      offline.push({...emp, shift, status:'off'});
+      return;
+    }
+
+    const etRange = parseShiftWindow(shift);
+
+    if(etRange === 'oncall') {
+      upcoming.push({...emp, shift, status:'oncall', etStart:null, etEnd:null});
+      return;
+    }
+
+    if(!etRange) {
+      upcoming.push({...emp, shift, status:'working', etStart:null, etEnd:null});
+      return;
+    }
+
+    const [etStart, etEnd] = etRange;
+
+    if(isLiveDay) {
+      if(etNow >= etStart && etNow < etEnd) {
+        // Currently within shift window → LIVE (green)
+        active.push({...emp, shift, status:'live', etStart, etEnd});
+      } else if(etNow < etStart) {
+        // Shift starts later today → UPCOMING (amber)
+        upcoming.push({...emp, shift, status:'upcoming', etStart, etEnd});
+      } else {
+        // Shift ended today → DONE (subtle, shift finished)
+        upcoming.push({...emp, shift, status:'done', etStart, etEnd});
+      }
+    } else {
+      upcoming.push({...emp, shift, status:'working', etStart, etEnd});
+    }
+  });
+
+  const grid = document.getElementById('wo-grid');
+  grid.innerHTML = '';
+
+  function personChip(p, cardStatus) {
+    const isKy = p.n === 'Ky Coony';
+
+    // Generate avatar color from name hash
+    const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16'];
+    const hash = p.n.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+    const avatarColor = colors[hash % colors.length];
+    const initials = p.n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+
+    let rowOpacity = '1';
+    let dotColor = 'transparent';
+    let dotBorder = 'rgba(255,255,255,.15)';
+    let shiftText = p.shift;
+    let nameColor = isKy ? 'var(--gold)' : 'var(--text)';
+    let avatarOpacity = '1';
+
+    // Show the shift exactly as it appears in the schedule
+    const shiftLabel = p.shift || 'OFF';
+
+    if(cardStatus==='live') {
+      dotColor = '#22c55e';
+      dotBorder = '#22c55e';
+      if(isKy) nameColor = 'var(--gold)';
+      shiftText = shiftLabel; // show ET window while live
+    } else if(cardStatus==='upcoming') {
+      // Shift starts later today — amber
+      dotColor = '#f59e0b';
+      dotBorder = '#f59e0b';
+      rowOpacity = '0.65';
+      avatarOpacity = '0.65';
+      if(p.etStart != null) {
+        const diff = p.etStart - etNow;
+        shiftText = shiftLabel + (diff < 1 ? ` · in ${Math.round(diff*60)}m` : ` · in ${Math.floor(diff)}h`);
+      }
+    } else if(cardStatus==='done') {
+      // Shift ended today — faded, checkmark indicator
+      dotColor = 'rgba(255,255,255,.18)';
+      dotBorder = 'rgba(255,255,255,.18)';
+      rowOpacity = '0.38';
+      avatarOpacity = '0.35';
+      shiftText = shiftLabel + ' · done';
+      nameColor = 'var(--text2)';
+    } else if(cardStatus==='working') {
+      // Non-live-day view
+      dotColor = 'rgba(255,255,255,.2)';
+      dotBorder = 'rgba(255,255,255,.2)';
+      rowOpacity = '0.6';
+      avatarOpacity = '0.6';
+      shiftText = shiftLabel;
+    } else if(cardStatus==='oncall') {
+      dotColor = '#fbbf24';
+      dotBorder = '#fbbf24';
+      shiftText = 'On Call';
+    } else {
+      // OFF today
+      rowOpacity = '0.2';
+      avatarOpacity = '0.2';
+      shiftText = 'OFF';
+      dotColor = 'rgba(255,255,255,.07)';
+      dotBorder = 'rgba(255,255,255,.07)';
+      nameColor = 'var(--text3)';
+    }
+
+    return `<div class="wo-person" style="opacity:${rowOpacity}">
+      <div class="wo-avatar" style="background:${avatarColor}20;color:${avatarColor};opacity:${avatarOpacity}">
+        ${initials}
+        <div class="wo-avatar-ring" style="border-color:${dotBorder};opacity:${cardStatus==='live'?1:0}"></div>
+        <div style="position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;background:${dotColor};border-radius:50%;border:1.5px solid var(--card)"></div>
+      </div>
+      <div class="wo-info">
+        <div class="wo-name" style="color:${nameColor}">${p.n}</div>
+        <div class="wo-shift-label">${shiftText||'OFF'}</div>
+      </div>
+    </div>`;
+  }
+
+  ['SBK', 'FlyWheelOps', 'Racing Ops'].forEach(grpName => {
+    const grpActive   = active.filter(p=>p.grp===grpName);
+    const grpUpcoming = upcoming.filter(p=>p.grp===grpName);
+    const grpOffline  = offline.filter(p=>p.grp===grpName);
+    const grpAll = [...grpActive, ...grpUpcoming, ...grpOffline];
+    if(grpAll.length === 0) return;
+
+    if(grpName==='Racing Ops' && grpActive.length===0 && grpUpcoming.length===0) return;
+
+    const card = document.createElement('div');
+    card.className = 'wo-card';
+    card.style.minWidth = '200px';
+
+    const liveCount = grpActive.length;
+    const todayCount = grpActive.length + grpUpcoming.length;
+    const headerColor = liveCount > 0 ? '#22c55e' : (todayCount > 0 ? 'var(--text2)' : 'var(--text3)');
+
+    let html = `<div class="wo-card-header" style="color:${headerColor}">
+      <span>${grpName}</span>
+      <span class="wo-card-count">${liveCount>0?`${liveCount} live · `:''}${todayCount} today</span>
+    </div><div class="wo-persons">`;
+
+    grpAll.forEach(p => html += personChip(p, p.status));
+    html += '</div>';
+    card.innerHTML = html;
+    grid.appendChild(card);
+  });
+
+  if(active.length === 0 && upcoming.length === 0) {
+    grid.innerHTML = '<div class="wo-empty">No shifts scheduled today</div>';
+  }
+}
+
+// ============================================================
+// TABLE RENDER
+// ============================================================
+function renderTable() {
+  const idx = viewIdx;
+  document.getElementById('back-today-btn').style.display = (idx !== todayIdx) ? 'block' : 'none';
+  renderHead(idx);
+  renderBody(idx);
+}
+
+function renderHead(todayI) {
+  const head = document.getElementById('table-head');
+  // Week row
+  let weekRow = '<tr><th class="name-col" rowspan="2">Name</th><th class="tz-col" rowspan="2">TZ</th>';
+  WEEKS.forEach(w => {
+    const isCur = w.current;
+    weekRow += `<th class="week-header" colspan="${w.span}" style="${isCur?'background:rgba(245,166,35,.1)':''}">${w.label}</th>`;
+  });
+  weekRow += '</tr>';
+
+  // Date row
+  let dateRow = '<tr>';
+  DATES.forEach((dt, i) => {
+    const isToday = i === todayI;
+    const isWkStart = WEEKS.some(w => w.start === i && w.start > 0);
+    const cls = [isToday?'today-col':'', isWkStart?'week-start':''].filter(Boolean).join(' ');
+    dateRow += `<th class="${cls}">
+      <div style="font-size:9px;opacity:.6">${dt.dy}</div>
+      <div style="font-size:11px">${dt.d}</div>
+    </th>`;
+  });
+  dateRow += '</tr>';
+  head.innerHTML = weekRow + dateRow;
+}
+
+function getFilteredEmps() {
+  const q = filterName.toLowerCase();
+  let g1 = G1.filter(e => {
+    if(filterGroup==='g2'||filterGroup==='g3') return false;
+    if(q && !e.n.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  let g2 = G2.filter(e => {
+    if(filterGroup==='g1'||filterGroup==='g3') return false;
+    if(q && !e.n.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  let g3 = G3.filter(e => {
+    if(filterGroup==='g1'||filterGroup==='g2') return false;
+    if(q && !e.n.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  return {g1, g2, g3};
+}
+
+function renderBody(todayI) {
+  const body = document.getElementById('table-body');
+  const {g1, g2, g3} = getFilteredEmps();
+  let html = '';
+
+  // Events row
+  html += '<tr class="event-row"><td class="name-col" style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase">Events</td><td class="tz-col"></td>';
+  DATES.forEach((dt, i) => {
+    const evs = EVENTS[i] || [];
+    const isToday = i === todayI;
+    const isWkStart = WEEKS.some(w => w.start === i && w.start > 0);
+    const cls = [isToday?'today-col':'', isWkStart?'week-start':''].filter(Boolean).join(' ');
+    html += `<td class="${cls}" style="vertical-align:top;padding:2px">`;
+    evs.forEach(ev => {
+      html += `<div class="event-chip ${ev.cls}">${ev.lbl}</div>`;
+    });
+    html += '</td>';
+  });
+  html += '</tr>';
+
+  // G1 Section
+  if(g1.length > 0) {
+    html += `<tr class="section-row"><td colspan="${DATES.length+2}">SBK</td></tr>`;
+    g1.forEach(emp => {
+      html += renderEmpRow(emp, todayI, 'g1');
+    });
+  }
+
+  // G2 Section
+  if(g2.length > 0) {
+    html += `<tr class="section-row"><td colspan="${DATES.length+2}">FlyWheelOps</td></tr>`;
+    g2.forEach(emp => {
+      html += renderEmpRow(emp, todayI, 'g2');
+    });
+  }
+
+  // G3 Section
+  if(g3.length > 0) {
+    html += `<tr class="section-row"><td colspan="${DATES.length+2}">Racing Ops</td></tr>`;
+    g3.forEach(emp => { html += renderEmpRow(emp, todayI, 'g3'); });
+  }
+
+  // Coverage row
+  html += '<tr class="coverage-row"><td class="name-col" style="font-weight:700;font-size:10px">Coverage</td><td class="tz-col"></td>';
+  DATES.forEach((dt, i) => {
+    const isToday = i === todayI;
+    const isWkStart = WEEKS.some(w => w.start === i && w.start > 0);
+    const cls = [isToday?'today-col':'', isWkStart?'week-start':''].filter(Boolean).join(' ');
+    const cov = COVERAGE[i] || '';
+    html += `<td class="${cls}">${cov ? `<span style="font-size:9px;color:var(--blue);font-weight:600">${cov}</span>` : ''}</td>`;
+  });
+  html += '</tr>';
+
+  body.innerHTML = html;
+}
+
+function renderEmpRow(emp, todayI, grpKey) {
+  const isPredicts = PREDICTS.includes(emp.n);
+  const isKy = emp.n === 'Ky Coony';
+  const rowCls = isPredicts ? 'predict-row' : '';
+  let html = `<tr class="${rowCls}">`;
+
+  // Name cell
+  const noteKey = `note_name_${emp.n}`;
+  const hasNote = !!localStorage.getItem(noteKey);
+  html += `<td class="name-col" onclick="openNameNote('${emp.n.replace(/'/g,"\\'")}')">
+    <div class="emp-name ${isKy?'ky-name':''}">${emp.n}${hasNote?'<span class="note-dot"></span>':''}</div>
+    <div class="emp-title">${TITLES[emp.n]||''}</div>
+  </td>`;
+  html += `<td class="tz-col">${emp.tz}</td>`;
+
+  // Date cells
+  DATES.forEach((dt, i) => {
+    const shift = (emp.s[i]||'').trim();
+    const isToday = i === todayI;
+    const isWkStart = WEEKS.some(w => w.start === i && w.start > 0);
+    const colCls = [isToday?'today-col':'', isWkStart?'week-start':''].filter(Boolean).join(' ');
+    const cellNoteKey = `note_${emp.n}_${dt.d}`;
+    const hasCellNote = !!localStorage.getItem(cellNoteKey);
+
+    let cellContent = '';
+    if(shift===''&&isToday) {
+      cellContent = '<span class="s-today-off">—</span>';
+    } else if(shift==='') {
+      cellContent = '';
+    } else if(shift==='OFF') {
+      cellContent = '<span class="s-off">—</span>';
+    } else {
+      const cls = shiftClass(shift);
+      const shortShift = shift.replace(' AM',' AM').replace(' PM',' PM')
+        .replace(' - ',' – ').replace(':00','');
+      cellContent = `<span class="shift-pill ${cls}">${shortShift}</span>`;
+    }
+
+    html += `<td class="${colCls}" onclick="openCellNote('${emp.n.replace(/'/g,"\\'")}','${dt.d}')">
+      <div class="cell-inner">
+        ${cellContent}
+        ${hasCellNote?'<span class="note-dot"></span>':''}
+      </div>
+    </td>`;
+  });
+
+  html += '</tr>';
+  return html;
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function navDay(delta) {
+  viewIdx = Math.max(0, Math.min(DATES.length-1, viewIdx + delta));
+  isAutoTracking = (viewIdx === todayIdx);
+  renderTable();
+  renderWhosOn();
+}
+
+function jumpToToday() {
+  viewIdx = todayIdx;
+  isAutoTracking = true;
+  renderTable();
+  renderWhosOn();
+  requestAnimationFrame(() => scrollToToday());
+}
+
+// ============================================================
+// FILTER
+// ============================================================
+function applyFilter() {
+  filterName = document.getElementById('search-input').value;
+  filterGroup = document.getElementById('group-filter').value;
+  renderBody(viewIdx);
+}
+
+// ============================================================
+// NOTES / MODAL
+// ============================================================
+function openCellNote(name, date) {
+  currentModalKey = `note_${name}_${date}`;
+  document.getElementById('modal-title').textContent = `Note — ${name} on ${date}`;
+  document.getElementById('modal-ta').value = localStorage.getItem(currentModalKey) || '';
+  document.getElementById('note-modal').style.display = 'flex';
+  document.getElementById('modal-ta').focus();
+}
+
+function openNameNote(name) {
+  currentModalKey = `note_name_${name}`;
+  document.getElementById('modal-title').textContent = `Note — ${name}`;
+  document.getElementById('modal-ta').value = localStorage.getItem(currentModalKey) || '';
+  document.getElementById('note-modal').style.display = 'flex';
+  document.getElementById('modal-ta').focus();
+}
+
+function saveNote() {
+  const val = document.getElementById('modal-ta').value.trim();
+  if(val) localStorage.setItem(currentModalKey, val);
+  else localStorage.removeItem(currentModalKey);
+  closeModal();
+  renderBody(viewIdx);
+}
+
+function deleteNote() {
+  localStorage.removeItem(currentModalKey);
+  closeModal();
+  renderBody(viewIdx);
+}
+
+function closeModal() {
+  document.getElementById('note-modal').style.display = 'none';
+  currentModalKey = null;
+}
+
+// Close modal on overlay click
+document.getElementById('note-modal').addEventListener('click', function(e) {
+  if(e.target === this) closeModal();
+});
+
+// ============================================================
+// TAB SWITCH
+// ============================================================
+function switchTab(t) {
+  document.getElementById('tab-schedule-pane').style.display = t==='schedule'?'':'none';
+  document.getElementById('tab-homepage-pane').style.display = t==='homepage'?'':'none';
+  document.getElementById('tab-schedule-btn').classList.toggle('active', t==='schedule');
+  document.getElementById('tab-homepage-btn').classList.toggle('active', t==='homepage');
+}
+
+// ============================================================
+// HP COVERAGE TAB
+// ============================================================
+const HP_DAYS = [];
+const SBK_WEEK = {};
+
+function buildHPTab() {
+  const grid = document.getElementById('hp-grid');
+  grid.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text3)">
+    <div style="font-size:48px;margin-bottom:12px">📋</div>
+    <div style="font-size:16px;font-weight:700;color:var(--text2);margin-bottom:8px">HP Coverage — June</div>
+    <div style="font-size:13px">Homepage coverage planning for June will appear here.</div>
+  </div>`;
+}
+
+// ============================================================
+// START
+// ============================================================
+init();
+</script>
+</body>
+</html>
